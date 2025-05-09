@@ -1,4 +1,4 @@
-import { getServerSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]';
 import connectToDatabase from '../../../lib/mongodb';
 import Note from '../../../models/Note';
