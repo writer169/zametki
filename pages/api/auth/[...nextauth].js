@@ -28,7 +28,8 @@ const UserSchema = new mongoose.Schema({
 // Создаем модель, если она еще не существует
 const User = mongoose.models.User || mongoose.model('User', UserSchema);
 
-export default NextAuth({
+// Экспортируем конфигурацию, чтобы использовать в других API
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -90,7 +91,9 @@ export default NextAuth({
   pages: {
     signIn: '/login',
   },
-});
+};
+
+export default NextAuth(authOptions);
 
 // Регистрационный эндпоинт (используйте только для начального создания пользователя)
 export async function registerUser(email, password, encryptionKey, salt) {
