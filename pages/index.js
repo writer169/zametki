@@ -6,7 +6,7 @@ import NoteList from '../components/NoteList';
 import NoteEditor from '../components/NoteEditor';
 import { FiPlus, FiSearch, FiRefreshCw, FiChevronLeft, FiEdit, FiFilter, FiX } from 'react-icons/fi';
 import { decryptNote, encryptNote } from '../lib/encryption';
-import { fetchNotes, createNote, updateNote, deleteNote } from '../utils/api';
+import { notesAPI } from '../utils/api'; // Импортируем notesAPI вместо отдельных функций
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -37,7 +37,8 @@ export default function Home() {
   const loadNotes = async () => {
     try {
       setIsLoading(true);
-      const fetchedNotes = await fetchNotes();
+      const response = await notesAPI.getAll(); // Используем notesAPI.getAll() вместо fetchNotes()
+      const fetchedNotes = response.notes || []; // Извлекаем заметки из ответа
       
       // Расшифровываем заметки
       const decryptedNotes = fetchedNotes.map(note => ({
@@ -86,10 +87,10 @@ export default function Home() {
       
       if (updatedNote._id) {
         // Обновляем существующую заметку
-        savedNote = await updateNote(updatedNote._id, encryptedNote);
+        savedNote = await notesAPI.update(updatedNote._id, encryptedNote); // Используем notesAPI.update
       } else {
         // Создаем новую заметку
-        savedNote = await createNote(encryptedNote);
+        savedNote = await notesAPI.create(encryptedNote); // Используем notesAPI.create
       }
       
       // Расшифровываем сохраненную заметку
@@ -120,7 +121,7 @@ export default function Home() {
   const handleDeleteNote = async (noteId) => {
     if (window.confirm('Вы уверены, что хотите удалить эту заметку?')) {
       try {
-        await deleteNote(noteId);
+        await notesAPI.delete(noteId); // Используем notesAPI.delete
         
         // Обновляем список заметок
         const updatedNotes = notes.filter(note => note._id !== noteId);
