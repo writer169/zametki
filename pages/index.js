@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import NoteList from '../components/NoteList';
 import NoteEditor from '../components/NoteEditor';
-import { FiPlus, FiSearch, FiRefreshCw } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiRefreshCw, FiChevronLeft, FiEdit, FiFilter, FiX } from 'react-icons/fi';
 import { decryptNote, encryptNote } from '../lib/encryption';
 import { fetchNotes, createNote, updateNote, deleteNote } from '../utils/api';
 
@@ -17,6 +17,8 @@ export default function Home() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTag, setActiveTag] = useState('');
+  const [showTagFilter, setShowTagFilter] = useState(false);
   
   // Перенаправляем на страницу входа, если пользователь не аутентифицирован
   useEffect(() => {
@@ -144,17 +146,46 @@ export default function Home() {
     setIsEditMode(false);
   };
   
-  // Фильтруем заметки по поисковому запросу
-  const filteredNotes = searchTerm.trim() === ''
-    ? notes
-    : notes.filter(note => {
-        const searchLower = searchTerm.toLowerCase();
-        return (
-          note.title.toLowerCase().includes(searchLower) ||
-          (note.content && note.content.toLowerCase().includes(searchLower)) ||
-          note.tags.some(tag => tag.toLowerCase().includes(searchLower))
-        );
-      });
+  // Получаем все уникальные теги из заметок
+  const getAllTags = () => {
+    const tagsSet = new Set();
+    notes.forEach(note => {
+      if (note.tags && note.tags.length > 0) {
+        note.tags.forEach(tag => tagsSet.add(tag));
+      }
+    });
+    return Array.from(tagsSet).sort();
+  };
+  
+  const handleTagClick = (tag) => {
+    if (activeTag === tag) {
+      setActiveTag('');
+    } else {
+      setActiveTag(tag);
+      setSearchTerm('');
+    }
+    setShowTagFilter(false);
+  };
+  
+  // Фильтруем заметки по поисковому запросу и активному тегу
+  const filteredNotes = notes.filter(note => {
+    // Сначала проверяем фильтр по тегу
+    if (activeTag && (!note.tags || !note.tags.includes(activeTag))) {
+      return false;
+    }
+    
+    // Затем проверяем поисковый запрос
+    if (searchTerm.trim() === '') {
+      return true;
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(searchLower) ||
+      (note.content && note.content.toLowerCase().includes(searchLower)) ||
+      note.tags.some(tag => tag.toLowerCase().includes(searchLower))
+    );
+  });
   
   // Если пользователь загружается, показываем загрузку
   if (status === 'loading') {
@@ -170,11 +201,13 @@ export default function Home() {
     );
   }
   
+  const allTags = getAllTags();
+  
   return (
     <Layout>
       {/* Мобильный вид */}
       <div className="md:hidden">
-        {/* Поиск и кнопка создания заметки */}
+        {/* Поиск, фильтр и кнопка создания заметки */}
         <div className="flex items-center space-x-2 mb-4">
           <div className="relative flex-grow">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -187,14 +220,87 @@ export default function Home() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="input pl-9"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <FiX className="h-4 w-4 text-neutral-400 hover:text-neutral-700" />
+              </button>
+            )}
           </div>
+          
+          <button
+            onClick={() => setShowTagFilter(!showTagFilter)}
+            className={`btn ${activeTag ? 'btn-primary' : 'btn-secondary'} flex-shrink-0 px-2.5`}
+            title="Фильтр по тегам"
+          >
+            <FiFilter className="h-5 w-5" />
+            {activeTag && <span className="sr-only">Активен фильтр: {activeTag}</span>}
+          </button>
+          
           <button
             onClick={handleCreateNote}
-            className="btn-primary flex-shrink-0"
+            className="btn-primary flex-shrink-0 px-2.5"
+            title="Создать новую заметку"
           >
             <FiPlus className="h-5 w-5" />
           </button>
         </div>
+        
+        {/* Фильтр по тегам (выпадающий) */}
+        {showTagFilter && (
+          <div className="mb-4 card animate-fade-in">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-medium text-neutral-800">Фильтр по тегам</h3>
+              <button 
+                onClick={() => setShowTagFilter(false)}
+                className="text-neutral-400 hover:text-neutral-700"
+              >
+                <FiX className="h-4 w-4" />
+              </button>
+            </div>
+            {allTags.length > 0 ? (
+              <div className="flex flex-wrap gap-1.5">
+                {allTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagClick(tag)}
+                    className={`tag cursor-pointer ${activeTag === tag ? 'bg-primary-600 text-white' : ''}`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                {activeTag && (
+                  <button
+                    onClick={() => setActiveTag('')}
+                    className="tag bg-red-100 text-red-800 cursor-pointer"
+                  >
+                    Сбросить фильтр
+                  </button>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-neutral-500">Нет доступных тегов</p>
+            )}
+          </div>
+        )}
+        
+        {/* Активный фильтр (показывается, если выбран тег и скрыт фильтр) */}
+        {activeTag && !showTagFilter && (
+          <div className="mb-4 flex items-center">
+            <span className="text-sm text-neutral-600 mr-2">Фильтр:</span>
+            <span className="tag bg-primary-600 text-white flex items-center">
+              {activeTag}
+              <button
+                onClick={() => setActiveTag('')}
+                className="ml-1.5 text-white"
+              >
+                <FiX className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          </div>
+        )}
         
         {/* Режим редактирования на мобильных */}
         {isEditMode && selectedNote ? (
@@ -207,9 +313,12 @@ export default function Home() {
           <div className="card animate-fade-in">
             <div className="mb-4">
               <h2 className="text-xl font-semibold text-neutral-800">{selectedNote.title}</h2>
+              <p className="text-xs text-neutral-500 mt-1">
+                {new Date(selectedNote.updatedAt).toLocaleDateString()} в {new Date(selectedNote.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </p>
               
               {selectedNote.tags && selectedNote.tags.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1.5">
+                <div className="mt-3 flex flex-wrap gap-1.5">
                   {selectedNote.tags.map((tag, index) => (
                     <span key={index} className="tag">{tag}</span>
                   ))}
@@ -226,17 +335,26 @@ export default function Home() {
                 onClick={handleEditNote}
                 className="btn-primary"
               >
+                <FiEdit className="w-4 h-4 mr-1.5" />
                 Редактировать
               </button>
             </div>
           </div>
         ) : (
-          <NoteList
-            notes={filteredNotes}
-            selectedNote={selectedNote}
-            onSelectNote={handleSelectNote}
-            onDeleteNote={handleDeleteNote}
-          />
+          <>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <FiRefreshCw className="w-6 h-6 text-primary-500 animate-spin" />
+              </div>
+            ) : (
+              <NoteList
+                notes={filteredNotes}
+                selectedNote={selectedNote}
+                onSelectNote={handleSelectNote}
+                onDeleteNote={handleDeleteNote}
+              />
+            )}
+          </>
         )}
         
         {/* Кнопка возврата в мобильном режиме */}
@@ -244,8 +362,9 @@ export default function Home() {
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
             <button
               onClick={() => setSelectedNote(null)}
-              className="btn-secondary shadow-soft"
+              className="btn-secondary shadow-soft flex items-center"
             >
+              <FiChevronLeft className="w-4 h-4 mr-1.5" />
               Назад к списку
             </button>
           </div>
@@ -256,42 +375,80 @@ export default function Home() {
       <div className="hidden md:grid md:grid-cols-12 md:gap-6">
         {/* Левая колонка - список заметок */}
         <div className="md:col-span-5 lg:col-span-4">
-          <div className="mb-4">
-            <div className="flex items-center space-x-2">
-              <div className="relative flex-grow">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiSearch className="h-4 w-4 text-neutral-400" />
+          <div className="sticky top-20">
+            <div className="mb-4 flex flex-col space-y-3">
+              <div className="flex items-center space-x-2">
+                <div className="relative flex-grow">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiSearch className="h-4 w-4 text-neutral-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Поиск заметок..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="input pl-9"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      <FiX className="h-4 w-4 text-neutral-400 hover:text-neutral-700" />
+                    </button>
+                  )}
                 </div>
-                <input
-                  type="text"
-                  placeholder="Поиск заметок..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input pl-9"
+                <button
+                  onClick={handleCreateNote}
+                  className="btn-primary flex-shrink-0 px-2.5"
+                  title="Создать новую заметку"
+                >
+                  <FiPlus className="h-5 w-5" />
+                </button>
+              </div>
+              
+              {/* Фильтр по тегам (всегда видимый в десктоп) */}
+              {allTags.length > 0 && (
+                <div className="card">
+                  <h3 className="font-medium text-neutral-800 mb-2">Фильтр по тегам</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {allTags.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => handleTagClick(tag)}
+                        className={`tag cursor-pointer ${activeTag === tag ? 'bg-primary-600 text-white' : ''}`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                    {activeTag && (
+                      <button
+                        onClick={() => setActiveTag('')}
+                        className="tag bg-red-100 text-red-800 cursor-pointer"
+                      >
+                        Сбросить
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {isLoading ? (
+              <div className="flex items-center justify-center h-40">
+                <FiRefreshCw className="w-6 h-6 text-primary-500 animate-spin" />
+              </div>
+            ) : (
+              <div className="overflow-y-auto max-h-[calc(100vh-240px)]">
+                <NoteList
+                  notes={filteredNotes}
+                  selectedNote={selectedNote}
+                  onSelectNote={handleSelectNote}
+                  onDeleteNote={handleDeleteNote}
                 />
               </div>
-              <button
-                onClick={handleCreateNote}
-                className="btn-primary flex-shrink-0"
-                title="Создать новую заметку"
-              >
-                <FiPlus className="h-5 w-5" />
-              </button>
-            </div>
+            )}
           </div>
-          
-          {isLoading ? (
-            <div className="flex items-center justify-center h-40">
-              <FiRefreshCw className="w-6 h-6 text-primary-500 animate-spin" />
-            </div>
-          ) : (
-            <NoteList
-              notes={filteredNotes}
-              selectedNote={selectedNote}
-              onSelectNote={handleSelectNote}
-              onDeleteNote={handleDeleteNote}
-            />
-          )}
         </div>
         
         {/* Правая колонка - просмотр/редактирование заметки */}
@@ -304,10 +461,10 @@ export default function Home() {
             />
           ) : selectedNote ? (
             <div className="card animate-fade-in">
-              <div className="mb-4">
+              <div className="mb-6 border-b border-neutral-100 pb-4">
                 <h2 className="text-2xl font-semibold text-neutral-800">{selectedNote.title}</h2>
                 <p className="text-sm text-neutral-500 mt-1">
-                  {new Date(selectedNote.updatedAt).toLocaleString()}
+                  Последнее обновление: {new Date(selectedNote.updatedAt).toLocaleDateString()} в {new Date(selectedNote.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                 </p>
                 
                 {selectedNote.tags && selectedNote.tags.length > 0 && (
@@ -319,7 +476,7 @@ export default function Home() {
                 )}
               </div>
               
-              <div className="prose text-neutral-700 mt-6 whitespace-pre-wrap">
+              <div className="prose text-neutral-700 whitespace-pre-wrap min-h-[200px]">
                 {selectedNote.content || <span className="text-neutral-400 italic">Нет содержимого</span>}
               </div>
               
@@ -328,6 +485,7 @@ export default function Home() {
                   onClick={handleEditNote}
                   className="btn-primary"
                 >
+                  <FiEdit className="w-4 h-4 mr-1.5" />
                   Редактировать
                 </button>
               </div>
@@ -345,3 +503,4 @@ export default function Home() {
       </div>
     </Layout>
   );
+}
