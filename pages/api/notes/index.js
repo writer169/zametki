@@ -1,11 +1,12 @@
-import { getSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth/react';
+import { authOptions } from '../auth/[...nextauth]';
 import connectToDatabase from '../../../lib/mongodb';
 import Note from '../../../models/Note';
 import { encryptData, decryptData } from '../../../lib/encryption';
 
 export default async function handler(req, res) {
-  // Проверяем авторизацию
-  const session = await getSession({ req });
+  // Проверяем авторизацию - используем getServerSession вместо getSession
+  const session = await getServerSession(req, res, authOptions);
   
   if (!session) {
     return res.status(401).json({ message: 'Не авторизован' });
