@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { FiSave, FiX, FiTag, FiFileText, FiType } from 'react-icons/fi';
 
 export default function NoteEditor({ note, onSave, onCancel }) {
   const [title, setTitle] = useState(note.title || '');
@@ -37,80 +36,67 @@ export default function NoteEditor({ note, onSave, onCancel }) {
   };
   
   return (
-    <div className="card animate-fade-in">
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <div className="flex items-center mb-1.5">
-            <FiType className="w-4 h-4 text-primary-500 mr-2" />
-            <label htmlFor="title" className="label">
-              Заголовок
-            </label>
-          </div>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input"
-            placeholder="Введите заголовок заметки"
-            required
-          />
-        </div>
-        
-        <div>
-          <div className="flex items-center mb-1.5">
-            <FiFileText className="w-4 h-4 text-primary-500 mr-2" />
-            <label htmlFor="content" className="label">
-              Содержимое
-            </label>
-          </div>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="input"
-            placeholder="Введите содержимое заметки"
-            rows={10}
-          />
-        </div>
-        
-        <div>
-          <div className="flex items-center mb-1.5">
-            <FiTag className="w-4 h-4 text-primary-500 mr-2" />
-            <label htmlFor="tags" className="label">
-              Теги (разделяйте запятыми)
-            </label>
-          </div>
-          <input
-            type="text"
-            id="tags"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            className="input"
-            placeholder="Работа, Проект, Идея"
-          />
-        </div>
-        
-        <div className="flex justify-end space-x-3 pt-3">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="btn-secondary"
-            disabled={isSaving}
-          >
-            <FiX className="w-4 h-4 mr-1.5" />
-            Отмена
-          </button>
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={isSaving}
-          >
-            <FiSave className="w-4 h-4 mr-1.5" />
-            {isSaving ? 'Сохранение...' : 'Сохранить'}
-          </button>
-        </div>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit}>
+      <div className="mb-4">
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          Заголовок
+        </label>
+        <input
+          type="text"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Введите заголовок заметки"
+          required
+        />
+      </div>
+      
+      <div className="mb-4">
+        <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+          Содержимое
+        </label>
+        <textarea
+          id="content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Введите содержимое заметки"
+          rows={15}
+        />
+      </div>
+      
+      <div className="mb-6">
+        <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+          Теги (разделяйте запятыми)
+        </label>
+        <input
+          type="text"
+          id="tags"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Работа, Проект, Идея"
+        />
+      </div>
+      
+      <div className="flex justify-end space-x-3">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          disabled={isSaving}
+        >
+          Отмена
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isSaving}
+        >
+          {isSaving ? 'Сохранение...' : 'Сохранить'}
+        </button>
+      </div>
+    </form>
   );
 }
