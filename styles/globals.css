@@ -25,44 +25,65 @@ a {
 
 /* Кастомные компоненты с помощью @apply */
 @layer components {
+  /* Базовые компоненты */
+  .card {
+    @apply bg-white rounded-xl shadow-card p-5;
+  }
+  
+  .input {
+    @apply block w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-neutral-800 
+    focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500;
+  }
+  
+  .label {
+    @apply font-medium text-sm text-neutral-700;
+  }
+  
+  /* Кнопки */
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors;
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-primary-600 text-white hover:bg-primary-700;
   }
   
   .btn-secondary {
-    @apply btn bg-white text-neutral-700 border border-neutral-200 hover:bg-neutral-50 focus:ring-primary-500;
+    @apply btn bg-white text-neutral-700 border border-neutral-200 hover:bg-neutral-50;
   }
   
   .btn-danger {
     @apply btn bg-white text-red-600 hover:bg-red-50 focus:ring-red-500;
   }
   
-  .input {
-    @apply w-full px-4 py-2.5 rounded-lg border border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition-all bg-white;
-  }
-  
-  .label {
-    @apply block text-sm font-medium text-neutral-700 mb-1.5;
-  }
-  
-  .tag {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800;
-  }
-
-  .card {
-    @apply bg-white rounded-xl shadow-card p-4;
-  }
-  
+  /* Карточки заметок */
   .note-card {
-    @apply rounded-xl bg-white shadow-card transition-all duration-200 hover:shadow-soft;
+    @apply bg-white shadow-card rounded-lg transition-all border border-transparent;
   }
   
   .note-card-selected {
-    @apply bg-primary-50 border-l-4 border-primary-500;
+    @apply border-primary-500 bg-primary-50;
+  }
+  
+  /* Теги */
+  .tag {
+    @apply inline-flex text-xs px-2 py-0.5 bg-neutral-100 text-neutral-700 rounded-full;
+  }
+  
+  /* Анимации */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
@@ -100,14 +121,4 @@ textarea {
 
 .prose strong {
   font-weight: 600;
-}
-
-/* Анимации */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
 }
