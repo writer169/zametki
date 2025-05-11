@@ -5,7 +5,7 @@ import Layout from '../components/Layout';
 import NoteList from '../components/NoteList';
 import NoteEditor from '../components/NoteEditor';
 import { FiPlus, FiSearch, FiRefreshCw, FiChevronLeft, FiEdit, FiFilter, FiX } from 'react-icons/fi';
-import { decryptNote, encryptNote } from '../lib/encryption';
+import { encryptData, decryptData } from '../lib/encryption';
 import { notesAPI } from '../utils/api'; // Импортируем notesAPI вместо отдельных функций
 
 export default function Home() {
@@ -43,9 +43,9 @@ export default function Home() {
       // Расшифровываем заметки
       const decryptedNotes = fetchedNotes.map(note => ({
         ...note,
-        title: decryptNote(note.title, session.user.encryptionKey),
-        content: note.content ? decryptNote(note.content, session.user.encryptionKey) : '',
-        tags: note.tags ? JSON.parse(decryptNote(note.tags, session.user.encryptionKey)) : []
+        title: decryptData(note.title, note.iv, session.user.encryptionKey),
+        content: note.content ? decryptData(note.content, note.iv, session.user.encryptionKey) : '',
+        tags: note.tags ? JSON.parse(decryptData(note.tags, note.tagsIv, session.user.encryptionKey)) : []
       }));
       
       // Сортируем заметки по дате обновления (сначала новые)
@@ -76,11 +76,18 @@ export default function Home() {
   const handleSaveNote = async (updatedNote) => {
     try {
       // Шифруем данные заметки
+      const titleEncryption = encryptData(updatedNote.title, session.user.encryptionKey);
+      const contentEncryption = encryptData(updatedNote.content, session.user.encryptionKey);
+      const tagsEncryption = encryptData(JSON.stringify(updatedNote.tags), session.user.encryptionKey);
+      
       const encryptedNote = {
         ...updatedNote,
-        title: encryptNote(updatedNote.title, session.user.encryptionKey),
-        content: encryptNote(updatedNote.content, session.user.encryptionKey),
-        tags: encryptNote(JSON.stringify(updatedNote.tags), session.user.encryptionKey)
+        title: titleEncryption.encryptedData,
+        iv: titleEncryption.iv,
+        content: contentEncryption.encryptedData,
+        contentIv: contentEncryption.iv,
+        tags: tagsEncryption.encryptedData,
+        tagsIv: tagsEncryption.iv
       };
       
       let savedNote;
@@ -96,9 +103,9 @@ export default function Home() {
       // Расшифровываем сохраненную заметку
       const decryptedSavedNote = {
         ...savedNote,
-        title: decryptNote(savedNote.title, session.user.encryptionKey),
-        content: savedNote.content ? decryptNote(savedNote.content, session.user.encryptionKey) : '',
-        tags: savedNote.tags ? JSON.parse(decryptNote(savedNote.tags, session.user.encryptionKey)) : []
+        title: decryptData(savedNote.title, savedNote.iv, session.user.encryptionKey),
+        content: savedNote.content ? decryptData(savedNote.content, savedNote.contentIv, session.user.encryptionKey) : '',
+        tags: savedNote.tags ? JSON.parse(decryptData(savedNote.tags, savedNote.tagsIv, session.user.encryptionKey)) : []
       };
       
       // Обновляем список заметок
