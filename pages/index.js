@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import useSWR, { mutate } from 'swr';
 import Head from 'next/head';
@@ -14,18 +14,12 @@ export default function Home() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   
-  // Загружаем заметки с использованием SWR
-  const { data: notes, error } = useSWR(
-    session ? '/api/notes' : null
-  );
-  
-  // Проверяем авторизацию
+  const { data: notes } = useSWR(session ? '/api/notes' : null);
+
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    }
+    if (status === 'unauthenticated') router.push('/login');
   }, [status, router]);
-  
+
   // Обработчик для создания новой заметки
   const handleNewNote = () => {
     setSelectedNote({
@@ -133,27 +127,26 @@ export default function Home() {
   if (status === 'unauthenticated') {
     return null; // Перенаправление происходит в useEffect
   }
-  
+
   return (
     <Layout>
       <Head>
         <title>Защищенные заметки</title>
       </Head>
       
-      <div className="flex h-screen overflow-hidden bg-gray-100">
-        {/* Боковая панель со списком заметок */}
-        <div className="w-1/4 h-full overflow-y-auto border-r border-gray-200 bg-white">
-          <div className="p-4 border-b border-gray-200">
-            <h1 className="text-xl font-bold">Мои заметки</h1>
+      <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+        {/* Боковая панель */}
+        <div className="w-full md:w-1/3 lg:w-1/4 h-1/2 md:h-full border-b md:border-r border-gray-200 bg-white">
+          <div className="p-3 border-b border-gray-200">
+            <h1 className="text-lg font-bold">Мои заметки</h1>
             <button
               onClick={handleNewNote}
-              className="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+              className="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-md text-sm"
             >
               Новая заметка
             </button>
           </div>
           
-          {/* Список заметок */}
           <NoteList
             notes={notes || []}
             selectedNote={selectedNote}
@@ -161,9 +154,9 @@ export default function Home() {
             onDeleteNote={handleDeleteNote}
           />
         </div>
-        
-        {/* Основная область с содержимым заметки */}
-        <div className="w-3/4 h-full overflow-y-auto p-6">
+
+        {/* Основная область */}
+        <div className="w-full md:w-2/3 lg:w-3/4 h-1/2 md:h-full overflow-y-auto p-4">
           {selectedNote ? (
             isEditing ? (
               <NoteEditor
@@ -178,31 +171,31 @@ export default function Home() {
                 }}
               />
             ) : (
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">{selectedNote.title}</h2>
-                  <div>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  <h2 className="text-xl font-bold break-words">{selectedNote.title}</h2>
+                  <div className="flex gap-2">
                     <button
                       onClick={handleEditNote}
-                      className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded mr-2"
+                      className="flex-1 bg-blue-500 text-white py-1.5 px-3 rounded-md text-sm"
                     >
                       Редактировать
                     </button>
                     <button
                       onClick={() => handleDeleteNote(selectedNote._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
+                      className="flex-1 bg-red-500 text-white py-1.5 px-3 rounded-md text-sm"
                     >
                       Удалить
                     </button>
                   </div>
                 </div>
                 
-                {selectedNote.tags && selectedNote.tags.length > 0 && (
-                  <div className="mb-4">
+                {selectedNote.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
                     {selectedNote.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2"
+                        className="px-2 py-0.5 bg-gray-200 text-xs rounded-full"
                       >
                         {tag}
                       </span>
@@ -210,23 +203,22 @@ export default function Home() {
                   </div>
                 )}
                 
-                <div className="prose max-w-none">
-                  {/* Отображаем содержимое с разбивкой на абзацы */}
-                  {selectedNote.content.split('\n').map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
+                <div className="prose note-content">
+                  {selectedNote.content.split('\n').map((p, i) => (
+                    <p key={i} className="mb-3">{p}</p>
                   ))}
                 </div>
                 
                 {selectedNote.updatedAt && (
-                  <div className="mt-6 text-sm text-gray-500">
+                  <div className="text-xs text-gray-500">
                     Обновлено: {new Date(selectedNote.updatedAt).toLocaleString()}
                   </div>
                 )}
               </div>
             )
           ) : (
-            <div className="text-center text-gray-500 mt-20">
-              <p>Выберите заметку или создайте новую</p>
+            <div className="text-center text-gray-500 mt-10 text-sm">
+              Выберите заметку или создайте новую
             </div>
           )}
         </div>
