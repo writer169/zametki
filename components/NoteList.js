@@ -1,49 +1,40 @@
 import { FiTrash2 } from 'react-icons/fi';
 
 export default function NoteList({ notes, selectedNote, onSelectNote, onDeleteNote }) {
-  // Если заметок нет, показываем сообщение
-  if (!notes || notes.length === 0) {
+  if (!notes?.length) {
     return (
-      <div className="p-4 text-center text-gray-500">
+      <div className="p-4 text-center text-gray-500 text-sm">
         У вас пока нет заметок
       </div>
     );
   }
-  
+
   return (
     <div className="divide-y divide-gray-200">
       {notes.map((note) => {
-        const isSelected = selectedNote && note._id === selectedNote._id;
-        
-        // Форматируем дату
-        const updatedDate = new Date(note.updatedAt);
-        const formattedDate = updatedDate.toLocaleDateString();
-        
-        // Для содержимого показываем только превью
-        const contentPreview = note.content
-          ? note.content.substring(0, 100) + (note.content.length > 100 ? '...' : '')
-          : '';
-        
+        const isSelected = selectedNote?._id === note._id;
+        const formattedDate = new Date(note.updatedAt).toLocaleDateString();
+        const contentPreview = note.content?.substring(0, 80) + (note.content?.length > 80 ? '...' : '');
+
         return (
           <div
             key={note._id}
-            className={`p-4 cursor-pointer hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}
+            className={`p-3 cursor-pointer hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}
+            onClick={() => onSelectNote(note)}
           >
-            <div className="flex justify-between items-start">
-              <div 
-                className="flex-grow"
-                onClick={() => onSelectNote(note)}
-              >
-                <h3 className="text-md font-semibold">{note.title}</h3>
-                <p className="text-sm text-gray-500 mt-1">{formattedDate}</p>
-                <p className="text-sm text-gray-600 mt-2 line-clamp-2">{contentPreview}</p>
-                
-                {note.tags && note.tags.length > 0 && (
-                  <div className="mt-2 flex flex-wrap">
-                    {note.tags.map((tag, index) => (
+            <div className="flex items-start justify-between">
+              <div className="flex-grow">
+                <h3 className="text-sm font-medium truncate">{note.title}</h3>
+                <p className="text-xs text-gray-500 mt-1">{formattedDate}</p>
+                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                  {contentPreview}
+                </p>
+                {note.tags?.length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {note.tags.map((tag, i) => (
                       <span
-                        key={index}
-                        className="mr-1 mb-1 px-2 py-0.5 bg-gray-200 text-xs rounded-full text-gray-700"
+                        key={i}
+                        className="px-1.5 py-0.5 bg-gray-200 text-[0.65rem] rounded-full"
                       >
                         {tag}
                       </span>
@@ -51,16 +42,14 @@ export default function NoteList({ notes, selectedNote, onSelectNote, onDeleteNo
                   </div>
                 )}
               </div>
-              
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // Предотвращаем выбор заметки
+                  e.stopPropagation();
                   onDeleteNote(note._id);
                 }}
-                className="ml-2 p-1 text-gray-500 hover:text-red-500"
-                title="Удалить заметку"
+                className="p-1 text-gray-400 hover:text-red-500"
               >
-                <FiTrash2 size={18} />
+                <FiTrash2 size={16} />
               </button>
             </div>
           </div>
