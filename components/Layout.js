@@ -15,19 +15,16 @@ export default function Layout({ children }) {
       
       {session && (
         <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16 items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold">Защищенные заметки</h1>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
+          <div className="px-4 sm:px-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center py-4">
+              <h1 className="text-lg font-bold mb-2 sm:mb-0">Защищенные заметки</h1>
+              <div className="flex items-center space-x-3">
+                <span className="text-xs text-gray-600 truncate max-w-[120px]">
                   {session.user.email}
                 </span>
                 <button
                   onClick={() => signOut({ callbackUrl: '/login' })}
-                  className="text-sm text-red-600 hover:text-red-800"
+                  className="text-xs text-red-600 hover:text-red-800 px-2 py-1 rounded"
                 >
                   Выйти
                 </button>
@@ -37,7 +34,7 @@ export default function Layout({ children }) {
         </header>
       )}
       
-      <main>{children}</main>
+      <main className="overflow-hidden">{children}</main>
     </>
   );
 }
