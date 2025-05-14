@@ -5,13 +5,16 @@
 @tailwind utilities;
 
 /* Базовые стили для приложения */
-html,
+html {
+  @apply h-full;
+}
+
 body {
   padding: 0;
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  @apply bg-neutral-50 text-neutral-900;
+  @apply h-full bg-gray-50 text-neutral-900;
 }
 
 a {
@@ -32,7 +35,7 @@ a {
   
   .input {
     @apply block w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-neutral-800 
-    focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500;
+    focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent;
   }
   
   .label {
@@ -93,6 +96,10 @@ textarea {
   resize: vertical;
 }
 
+input, textarea {
+  @apply focus:ring-2 focus:ring-blue-400 focus:border-transparent;
+}
+
 /* Вспомогательные классы */
 .line-clamp-1 {
   display: -webkit-box;
@@ -110,8 +117,9 @@ textarea {
 
 /* Стили для редактора заметок */
 .prose {
-  max-width: 65ch;
-  line-height: 1.6;
+  max-width: 100%;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .prose p {
@@ -121,4 +129,18 @@ textarea {
 
 .prose strong {
   font-weight: 600;
+}
+
+.note-content p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .prose {
+    font-size: 14px;
+  }
+  .prose p {
+    margin-top: 0.75em;
+    margin-bottom: 0.75em;
+  }
 }
