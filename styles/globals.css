@@ -73,19 +73,35 @@ a {
 
   /* Карточки заметок */
   .note-card {
-    @apply bg-white rounded-xl shadow-md mb-3 p-4;
+    @apply bg-white rounded-xl shadow-md mb-4 p-4;
     @apply mx-2 sm:mx-0;
+    position: relative;
+    z-index: 1;
     transition: all 0.2s ease-in-out;
   }
 
   /* Состояние выбранной карточки */
   .note-card-selected {
     @apply border-blue-500 bg-blue-50 shadow-lg;
+    z-index: 2;
   }
 
   /* Теги */
   .tag {
     @apply inline-flex text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full;
+  }
+
+  /* Контейнер списка заметок */
+  .notes-list-container {
+    @apply overflow-y-auto pb-6;
+    max-height: calc(100vh - 120px);
+  }
+
+  /* Контейнер редактора заметок */
+  .note-editor-container {
+    @apply bg-white rounded-xl shadow-lg p-5;
+    position: relative;
+    z-index: 10;
   }
 
   /* Анимации */
