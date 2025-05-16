@@ -76,14 +76,12 @@ a {
     @apply bg-white rounded-xl shadow-md mb-4 p-4;
     @apply mx-2 sm:mx-0;
     position: relative;
-    z-index: 1;
     transition: all 0.2s ease-in-out;
   }
 
   /* Состояние выбранной карточки */
   .note-card-selected {
     @apply border-blue-500 bg-blue-50 shadow-lg;
-    z-index: 2;
   }
 
   /* Теги */
@@ -94,14 +92,37 @@ a {
   /* Контейнер списка заметок */
   .notes-list-container {
     @apply overflow-y-auto pb-6;
-    max-height: calc(100vh - 120px);
+    height: 100%;
+  }
+
+  /* Контейнер для детального просмотра заметки */
+  .note-detail-view {
+    @apply bg-white rounded-xl shadow-lg p-5 animate-fade-in;
+    min-height: 300px;
+    height: 100%;
   }
 
   /* Контейнер редактора заметок */
   .note-editor-container {
-    @apply bg-white rounded-xl shadow-lg p-5;
-    position: relative;
-    z-index: 10;
+    @apply bg-white rounded-xl shadow-lg p-5 animate-fade-in;
+    min-height: 300px;
+    height: 100%;
+  }
+  
+  /* Контейнер приложения для переключения между списком и детальным просмотром */
+  .app-container {
+    @apply h-full flex flex-col;
+    height: calc(100vh - 80px);
+  }
+  
+  /* Заголовок с навигацией обратно к списку */
+  .note-detail-header {
+    @apply flex items-center justify-between mb-4 pb-3 border-b;
+  }
+  
+  /* Кнопка возврата к списку */
+  .back-button {
+    @apply flex items-center text-blue-600 hover:text-blue-800 transition-colors;
   }
 
   /* Анимации */
