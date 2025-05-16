@@ -7,16 +7,18 @@
 
 /* Базовые стили для приложения */
 html {
-  @apply h-full;
+  height: 100%;
 }
 
 body {
   padding: 0;
   margin: 0;
+  height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  /* Применяем легкий градиент к фону */
-  @apply h-full bg-gradient-to-br-light text-neutral-900;
+  /* Простой фон вместо градиента для отладки */
+  background-color: #f8fafc;
+  color: #0f172a;
   background-attachment: fixed; /* Чтобы градиент не скроллился */
 }
 
@@ -29,29 +31,27 @@ a {
   box-sizing: border-box;
 }
 
-/* Кастомные компоненты с помощью @apply */
+/* Явное определение базовых компонентов */
 @layer components {
   /* Базовые компоненты */
   .card {
-    /* Улучшаем базовую карточку */
-    @apply bg-white rounded-xl shadow-soft p-5;
-    transition: all 0.2s ease-in-out; /* Добавляем плавность */
+    @apply bg-white rounded-xl shadow-lg p-5;
+    transition: all 0.2s ease-in-out;
   }
 
-  /* Стили для карточки при наведении/фокусе */
   .card:hover,
   .card:focus-within {
-    @apply shadow-card-hover;
-    transform: translateY(-2px); /* Легкий подъем */
+    @apply shadow-xl;
+    transform: translateY(-2px);
   }
 
   .input {
-    @apply block w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-neutral-800
-    focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent;
+    @apply block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-800
+    focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent;
   }
 
   .label {
-    @apply font-medium text-sm text-neutral-700;
+    @apply font-medium text-sm text-gray-700;
   }
 
   /* Кнопки */
@@ -60,38 +60,32 @@ a {
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700;
+    @apply btn bg-blue-600 text-white hover:bg-blue-700;
   }
 
   .btn-secondary {
-    @apply btn bg-white text-neutral-700 border border-neutral-200 hover:bg-neutral-50;
+    @apply btn bg-white text-gray-700 border border-gray-200 hover:bg-gray-50;
   }
 
   .btn-danger {
-    @apply btn bg-white text-red-600 hover:bg-red-50 focus:ring-red-500;
+    @apply btn bg-white text-red-600 hover:bg-red-50;
   }
 
   /* Карточки заметок */
   .note-card {
-    /* Применяем стили карточки и дорабатываем */
-    @apply card !shadow-card mb-3; /* Используем базовую карточку, переопределяем тень */
-    /* !important используется, чтобы убедиться, что shadow-card применяется,
-       хотя обычно лучше избегать !important, если можно переопределить по-другому */
-    /* Мобильные отступы */
+    @apply bg-white rounded-xl shadow-md mb-3 p-4;
     @apply mx-2 sm:mx-0;
+    transition: all 0.2s ease-in-out;
   }
 
   /* Состояние выбранной карточки */
   .note-card-selected {
-    @apply border-primary-500 bg-primary-50 shadow-card-hover; /* Используем новую тень */
-    /* Можно добавить subtle градиент для выбранной карточки */
-    /* @apply bg-gradient-to-br-primary-light; */
+    @apply border-blue-500 bg-blue-50 shadow-lg;
   }
 
   /* Теги */
   .tag {
-    /* Используем утилиты Tailwind напрямую для большей гибкости */
-    @apply inline-flex text-xs px-2 py-0.5 bg-neutral-100 text-neutral-700 rounded-full;
+    @apply inline-flex text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full;
   }
 
   /* Анимации */
@@ -117,11 +111,6 @@ textarea {
   resize: vertical;
 }
 
-/* Убираем дублирование стилей фокуса, так как они уже в .input */
-/* input, textarea {
-  @apply focus:ring-2 focus:ring-blue-400 focus:border-transparent;
-} */
-
 /* Вспомогательные классы */
 .line-clamp-1 {
   display: -webkit-box;
@@ -138,9 +127,6 @@ textarea {
 }
 
 /* Стили для редактора заметок */
-/* Убираем стили .prose, если вы не используете @tailwindcss/typography для рендеринга контента заметок.
-   Если используете, то эти стили нужны для форматирования текста внутри редактора или отображения заметки.
-   Предполагаем, что вы их используете для отображения контента заметки. */
 .prose {
   max-width: 100%;
   font-size: 15px;
