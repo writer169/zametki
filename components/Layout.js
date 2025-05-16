@@ -1,46 +1,9 @@
-// components/Layout.js
-import { useSession, signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import Head from 'next/head';
-import { useState } from 'react';
-import NoteList from './NoteList';
-import NoteDetail from './NoteDetail';
-import NoteEditor from './NoteEditor';
 
-export default function Layout({ children, notes = [], onSaveNote, onDeleteNote }) {
+export default function Layout({ children }) {
   const { data: session } = useSession();
-
-  const [selectedNote, setSelectedNote] = useState(null);
-  const [viewMode, setViewMode] = useState('list'); // 'list', 'detail', 'edit'
-
-  const handleSelectNote = (note) => {
-    setSelectedNote(note);
-    setViewMode('detail');
-  };
-
-  const handleEditNote = (note) => {
-    setSelectedNote(note);
-    setViewMode('edit');
-  };
-
-  const handleBackToList = () => {
-    setViewMode('list');
-    setSelectedNote(null);
-  };
-
-  const handleSaveNote = async (updatedNote) => {
-    await onSaveNote(updatedNote);
-    setViewMode('detail');
-  };
-
-  const handleDeleteNote = async (noteId) => {
-    if (window.confirm('Вы уверены, что хотите удалить эту заметку?')) {
-      await onDeleteNote(noteId);
-      if (selectedNote && selectedNote._id === noteId) {
-        handleBackToList();
-      }
-    }
-  };
-
+  
   return (
     <>
       <Head>
@@ -49,7 +12,7 @@ export default function Layout({ children, notes = [], onSaveNote, onDeleteNote 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
+      
       {session && (
         <header className="bg-white shadow-sm">
           <div className="px-4 sm:px-6">
@@ -70,41 +33,8 @@ export default function Layout({ children, notes = [], onSaveNote, onDeleteNote 
           </div>
         </header>
       )}
-
-      <main className="overflow-hidden p-4">
-        {session ? (
-          <div className="app-container">
-            {viewMode === 'list' && (
-              <NoteList
-                notes={notes}
-                selectedNote={selectedNote}
-                onSelectNote={handleSelectNote}
-                onEditNote={handleEditNote}
-                onDeleteNote={handleDeleteNote}
-              />
-            )}
-
-            {viewMode === 'detail' && selectedNote && (
-              <NoteDetail
-                note={selectedNote}
-                onBack={handleBackToList}
-                onEdit={handleEditNote}
-                onDelete={handleDeleteNote}
-              />
-            )}
-
-            {viewMode === 'edit' && selectedNote && (
-              <NoteEditor
-                note={selectedNote}
-                onSave={handleSaveNote}
-                onCancel={() => selectedNote._id ? setViewMode('detail') : handleBackToList()}
-              />
-            )}
-          </div>
-        ) : (
-          children // например, <LoginPage /> или что-то ещё
-        )}
-      </main>
+      
+      <main className="overflow-hidden">{children}</main>
     </>
   );
 }
