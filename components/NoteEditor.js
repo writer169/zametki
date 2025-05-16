@@ -1,4 +1,6 @@
+// components/NoteEditor.js
 import { useState } from 'react';
+import { FiArrowLeft } from 'react-icons/fi';
 
 export default function NoteEditor({ note, onSave, onCancel }) {
   const [title, setTitle] = useState(note.title || '');
@@ -21,6 +23,16 @@ export default function NoteEditor({ note, onSave, onCancel }) {
 
   return (
     <div className="note-editor-container">
+      <div className="note-detail-header">
+        <button 
+          onClick={onCancel}
+          className="back-button"
+          aria-label="Вернуться к списку заметок"
+        >
+          <FiArrowLeft className="mr-2" /> Отменить редактирование
+        </button>
+      </div>
+      
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Заголовок</label>
@@ -39,7 +51,7 @@ export default function NoteEditor({ note, onSave, onCancel }) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="w-full px-3 py-2 border rounded-md text-sm"
-            rows={8}
+            rows={10} // Увеличиваем количество строк для лучшего UX
             placeholder="Текст вашей заметки..."
           />
         </div>
@@ -54,15 +66,7 @@ export default function NoteEditor({ note, onSave, onCancel }) {
           />
         </div>
 
-        <div className="flex gap-2 pt-2"> {/* Добавляем отступ сверху */}
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isSaving}
-            className="flex-1 px-4 py-2 bg-gray-100 rounded-md text-sm"
-          >
-            Отмена
-          </button>
+        <div className="flex gap-2 pt-4"> {/* Увеличиваем отступ сверху */}
           <button
             type="submit"
             disabled={isSaving}
