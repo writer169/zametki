@@ -1,40 +1,75 @@
-import { signOut, useSession } from 'next-auth/react';
-import Head from 'next/head';
+// components/Layout.js
+import { useState } from 'react';
+import NoteList from './NoteList';
+import NoteDetail from './NoteDetail';
+import NoteEditor from './NoteEditor';
 
-export default function Layout({ children }) {
-  const { data: session } = useSession();
+export default function Layout({ notes = [], onSaveNote, onDeleteNote }) {
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [viewMode, setViewMode] = useState('list'); // 'list', 'detail', 'edit'
+  
+  // Обработчик выбора заметки для просмотра
+  const handleSelectNote = (note) => {
+    setSelectedNote(note);
+    setViewMode('detail');
+  };
+  
+  // Обработчик для режима редактирования
+  const handleEditNote = (note) => {
+    setSelectedNote(note);
+    setViewMode('edit');
+  };
+  
+  // Обработчик для возврата к списку
+  const handleBackToList = () => {
+    setViewMode('list');
+    setSelectedNote(null);
+  };
+  
+  // Обработчик для сохранения заметки
+  const handleSaveNote = async (updatedNote) => {
+    await onSaveNote(updatedNote);
+    setViewMode('detail'); // После сохранения показываем заметку в режиме просмотра
+  };
+  
+  // Обработчик для удаления заметки
+  const handleDeleteNote = async (noteId) => {
+    if (window.confirm('Вы уверены, что хотите удалить эту заметку?')) {
+      await onDeleteNote(noteId);
+      if (selectedNote && selectedNote._id === noteId) {
+        handleBackToList();
+      }
+    }
+  };
   
   return (
-    <>
-      <Head>
-        <title>Защищенные заметки</title>
-        <meta name="description" content="Безопасное приложение для хранения заметок" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      
-      {session && (
-        <header className="bg-white shadow-sm">
-          <div className="px-4 sm:px-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center py-4">
-              <h1 className="text-lg font-bold mb-2 sm:mb-0">Защищенные заметки</h1>
-              <div className="flex items-center space-x-3">
-                <span className="text-xs text-gray-600 truncate max-w-[120px]">
-                  {session.user.email}
-                </span>
-                <button
-                  onClick={() => signOut({ callbackUrl: '/login' })}
-                  className="text-xs text-red-600 hover:text-red-800 px-2 py-1 rounded"
-                >
-                  Выйти
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
+    <div className="app-container">
+      {viewMode === 'list' && (
+        <NoteList 
+          notes={notes} 
+          selectedNote={selectedNote}
+          onSelectNote={handleSelectNote}
+          onEditNote={handleEditNote}
+          onDeleteNote={handleDeleteNote}
+        />
       )}
       
-      <main className="overflow-hidden">{children}</main>
-    </>
+      {viewMode === 'detail' && selectedNote && (
+        <NoteDetail 
+          note={selectedNote}
+          onBack={handleBackToList}
+          onEdit={handleEditNote}
+          onDelete={handleDeleteNote}
+        />
+      )}
+      
+      {viewMode === 'edit' && selectedNote && (
+        <NoteEditor 
+          note={selectedNote}
+          onSave={handleSaveNote}
+          onCancel={() => selectedNote._id ? setViewMode('detail') : handleBackToList()}
+        />
+      )}
+    </div>
   );
 }
