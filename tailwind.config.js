@@ -2,8 +2,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './**/*.{html,js,jsx,ts,tsx}', // Дополнительное сканирование для других файлов
   ],
   theme: {
     screens: {
@@ -85,6 +87,12 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/typography'),
-    // Удалите require('@tailwindcss/line-clamp'), так как он теперь встроен в Tailwind CSS v3.3+
   ],
+  // Добавляем опцию для включения всех используемых классов
+  safelist: [
+    'note-card',
+    'note-card-selected',
+    'tag',
+    // Другие кастомные классы, которые могут не обнаруживаться при сканировании
+  ]
 }
