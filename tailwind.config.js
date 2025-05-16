@@ -1,3 +1,4 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -64,13 +65,27 @@ module.exports = {
       boxShadow: {
         'soft': '0 4px 20px rgba(0, 0, 0, 0.08)',
         'card': '0 2px 10px rgba(0, 0, 0, 0.06)',
+        // Добавляем более выраженную тень для активной карточки
+        'card-hover': '0 4px 15px rgba(0, 0, 0, 0.1)',
       },
       spacing: {
         '18': '4.5rem',
       },
       fontSize: {
         '2xs': '.7rem',
-      }
+      },
+      // Добавляем градиенты в тему
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic':
+          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        // Subtle linear gradients
+        'gradient-to-br-light': 'linear-gradient(to bottom right, var(--tw-gradient-from, #f8fafc), var(--tw-gradient-to, #e2e8f0))', // neutral-50 to neutral-200
+        'gradient-to-tr-light': 'linear-gradient(to top right, var(--tw-gradient-from, #f8fafc), var(--tw-gradient-to, #e2e8f0))', // neutral-50 to neutral-200
+        'gradient-to-b-light': 'linear-gradient(to bottom, var(--tw-gradient-from, #f8fafc), var(--tw-gradient-to, #e2e8f0))', // neutral-50 to neutral-200
+        // Градиент с primary цветом для выбранной карточки
+        'gradient-to-br-primary-light': 'linear-gradient(to bottom right, var(--tw-gradient-from, #f0f9ff), var(--tw-gradient-to, #bae6fd))', // primary-50 to primary-200
+      },
     },
   },
   plugins: [
