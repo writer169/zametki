@@ -1,3 +1,4 @@
+// components/NoteList.js
 import { FiTrash2 } from 'react-icons/fi';
 
 export default function NoteList({ notes, selectedNote, onSelectNote, onDeleteNote }) {
@@ -10,31 +11,36 @@ export default function NoteList({ notes, selectedNote, onSelectNote, onDeleteNo
   }
 
   return (
-    <div className="divide-y divide-gray-200">
+    // Добавляем отступ сверху для списка, чтобы первая карточка не прилипала к шапке (если она есть)
+    <div className="pt-4 md:pt-6">
       {notes.map((note) => {
         const isSelected = selectedNote?._id === note._id;
         const formattedDate = new Date(note.updatedAt).toLocaleDateString();
-        const contentPreview = note.content?.substring(0, 80) + (note.content?.length > 80 ? '...' : '');
+        // Отображаем превью контента или заглушку, если контента нет
+        const contentPreview = note.content
+          ? note.content.substring(0, 80) + (note.content.length > 80 ? '...' : '')
+          : 'Нет содержимого...';
 
         return (
           <div
             key={note._id}
-            className={`p-3 cursor-pointer hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}
+            // Применяем классы note-card и note-card-selected
+            className={`note-card cursor-pointer ${isSelected ? 'note-card-selected' : ''}`}
             onClick={() => onSelectNote(note)}
           >
             <div className="flex items-start justify-between">
-              <div className="flex-grow">
-                <h3 className="text-sm font-medium truncate">{note.title}</h3>
-                <p className="text-xs text-gray-500 mt-1">{formattedDate}</p>
-                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+              <div className="flex-grow pr-4"> {/* Добавляем отступ справа для кнопки */}
+                <h3 className="text-base font-semibold text-neutral-800 truncate">{note.title || 'Новая заметка'}</h3> {/* Улучшаем заголовок */}
+                <p className="text-xs text-neutral-500 mt-1">{formattedDate}</p> {/* Используем neutral-500 для даты */}
+                <p className="text-sm text-neutral-600 mt-2 line-clamp-2"> {/* Увеличиваем размер текста превью */}
                   {contentPreview}
                 </p>
                 {note.tags?.length > 0 && (
-                  <div className="mt-1 flex flex-wrap gap-1">
+                  <div className="mt-3 flex flex-wrap gap-2"> {/* Увеличиваем отступ и gap для тегов */}
                     {note.tags.map((tag, i) => (
                       <span
                         key={i}
-                        className="px-1.5 py-0.5 bg-gray-200 text-[0.65rem] rounded-full"
+                        className="tag" // Используем класс .tag
                       >
                         {tag}
                       </span>
@@ -44,12 +50,13 @@ export default function NoteList({ notes, selectedNote, onSelectNote, onDeleteNo
               </div>
               <button
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation(); // Предотвращаем срабатывание onClick карточки
                   onDeleteNote(note._id);
                 }}
-                className="p-1 text-gray-400 hover:text-red-500"
+                className="p-2 text-neutral-400 hover:text-red-500 transition-colors" // Увеличиваем padding и добавляем плавность
+                aria-label={`Удалить заметку "${note.title || 'без названия'}"`} // Добавляем aria-label для доступности
               >
-                <FiTrash2 size={16} />
+                <FiTrash2 size={18} /> {/* Увеличиваем размер иконки */}
               </button>
             </div>
           </div>
