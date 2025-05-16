@@ -20,56 +20,58 @@ export default function NoteEditor({ note, onSave, onCancel }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1">Заголовок</label>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-3 py-2 border rounded-md text-sm"
-          placeholder="Название заметки"
-          required
-        />
-      </div>
+    <div className="note-editor-container">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">Заголовок</label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md text-sm"
+            placeholder="Название заметки"
+            required
+          />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Содержимое</label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full px-3 py-2 border rounded-md text-sm"
-          rows={8}
-          placeholder="Текст вашей заметки..."
-        />
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Содержимое</label>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md text-sm"
+            rows={8}
+            placeholder="Текст вашей заметки..."
+          />
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-1">Теги</label>
-        <input
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          className="w-full px-3 py-2 border rounded-md text-sm"
-          placeholder="работа, личное, идеи..."
-        />
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Теги</label>
+          <input
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md text-sm"
+            placeholder="работа, личное, идеи..."
+          />
+        </div>
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={isSaving}
-          className="flex-1 px-4 py-2 bg-gray-100 rounded-md text-sm"
-        >
-          Отмена
-        </button>
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md text-sm"
-        >
-          {isSaving ? 'Сохранение...' : 'Сохранить'}
-        </button>
-      </div>
-    </form>
+        <div className="flex gap-2 pt-2"> {/* Добавляем отступ сверху */}
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isSaving}
+            className="flex-1 px-4 py-2 bg-gray-100 rounded-md text-sm"
+          >
+            Отмена
+          </button>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md text-sm"
+          >
+            {isSaving ? 'Сохранение...' : 'Сохранить'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
